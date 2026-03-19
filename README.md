@@ -470,6 +470,106 @@ sequenceDiagram
 
 ---
 
+### Структура данных — основные модели
+
+![Структура данных](./docs/images/class_diagram.png)
+
+<details>
+<summary>Показать DSL</summary>
+
+```mermaid
+classDiagram
+    class TokenRequest {
+        +str grantType
+        +str clientId
+        +str clientSecret
+    }
+
+    class TokenResponse {
+        +str accessToken
+        +str tokenType = "Bearer"
+        +int expiresIn = 3600
+    }
+
+    class WsRequest {
+        +str sessionId
+        +str requestId
+        +int timestamp
+        +str type
+        +str liftId
+        +list liftIds
+        +str carId
+        +str fromAreaId
+        +str toAreaId
+        +str areaId
+        +int duration
+        +int delay
+        +str reason
+        +str status
+        +str robotSn
+    }
+
+    class WsResponse {
+        +int code
+        +str msg
+        +Any data
+    }
+
+    class LiftConfig {
+        +str liftId
+        +str displayName
+        +list~LiftDestination~ destinations
+        +list~LiftCar~ cars
+    }
+
+    class LiftDestination {
+        +str areaId
+        +str floorId
+        +str displayName
+        +str doorId
+    }
+
+    class LiftCar {
+        +str carId
+        +list~str~ doors
+    }
+
+    class Session {
+        +str session_id
+        +WebSocket websocket
+        +set mode_sub_lifts
+        +set status_sub_lifts
+    }
+
+    class LiftModePush {
+        +str type = "V1_LIFT_MODE"
+        +int timestamp
+        +str liftId
+        +bool available
+        +str message
+    }
+
+    class LiftStatusPush {
+        +str type = "V1_LIFT_STATUS"
+        +int timestamp
+        +str liftId
+        +str carId
+        +str areaId
+        +str doorId
+        +str doorStatus
+        +str direction
+        +int duration
+    }
+
+    LiftConfig "1" *-- "1..*" LiftDestination
+    LiftConfig "1" *-- "1..*" LiftCar
+    Session "1" --> "0..*" LiftConfig : подписан на статус/режим
+```
+
+</details>
+
+---
+
 ## Статус интеграции
 
 Адаптер реализует полный каркас протокола. Для подключения к реальной системе управления лифтом необходимо заполнить следующие точки интеграции:
