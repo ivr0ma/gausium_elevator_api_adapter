@@ -9,33 +9,48 @@ from __future__ import annotations
 
 import time
 from dataclasses import dataclass, field
+from pathlib import Path
 from typing import Any, Dict, List, Optional, Set
 
+import yaml
 from fastapi import WebSocket
 
 from .models import LiftCar, LiftConfig, LiftDestination
 
 
 # ---------------------------------------------------------------------------
-# Stub elevator catalogue
+# Elevator catalogue — loaded from config.yaml
 # ---------------------------------------------------------------------------
-# Populate this with real data or load from a database / config file.
 
-LIFTS: Dict[str, LiftConfig] = {
-    "1b3ace92-95e7-4d35-89a5-391c0ac8298e": LiftConfig(
-        liftId="1b3ace92-95e7-4d35-89a5-391c0ac8298e",
-        displayName="Elevator 1",
-        destinations=[
-            LiftDestination(areaId="1000", floorId="1", displayName="1F", doorId=1),
-            LiftDestination(areaId="2000", floorId="2", displayName="2F", doorId=1),
-            LiftDestination(areaId="3000", floorId="3", displayName="3F", doorId=2),
-        ],
-        cars=[
-            LiftCar(carId="1001010", doors=[1, 2]),
-            LiftCar(carId="1001011", doors=[1, 2]),
-        ],
-    ),
-}
+def _load_lifts() -> Dict[str, LiftConfig]:
+    config_path = Path(__file__).parent.parent / "config.yaml"
+    with open(config_path) as f:
+        data = yaml.safe_load(f)
+
+    result: Dict[str, LiftConfig] = {}
+    for lift in data["lifts"]:
+        lift_id = lift["lift_id"]
+        result[lift_id] = LiftConfig(
+            liftId=lift_id,
+            displayName=lift["display_name"],
+            destinations=[
+                LiftDestination(
+                    areaId=d["area_id"],
+                    floorId=d["floor_id"],
+                    displayName=d["display_name"],
+                    doorId=d["door_id"],
+                )
+                for d in lift["destinations"]
+            ],
+            cars=[
+                LiftCar(carId=c["car_id"], doors=c["doors"])
+                for c in lift["cars"]
+            ],
+        )
+    return result
+
+
+LIFTS: Dict[str, LiftConfig] = _load_lifts()
 
 
 # ---------------------------------------------------------------------------

@@ -1,0 +1,21 @@
+lifts:
+  - lift_id: "1b3ace92-95e7-4d35-89a5-391c0ac8298e"
+    display_name: "Elevator 1"
+    destinations:
+      - area_id: "1000"
+        floor_id: "1"
+        display_name: "1F"
+        door_id: 1
+      - area_id: "2000"
+        floor_id: "2"
+        display_name: "2F"
+        door_id: 1
+      - area_id: "3000"
+        floor_id: "3"
+        display_name: "3F"
+        door_id: 2
+    cars:
+      - car_id: "1001010"
+        doors: [1, 2]
+      - car_id: "1001011"
+        doors: [1, 2]
